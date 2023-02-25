@@ -1,0 +1,190 @@
+---- App.vue ---
+
+<template>
+  <header class="top-bar spread">
+        <nav class="top-bar-nav">
+          <router-link to="/" class="top-bar-link">
+            <i class="icofont-spoon-and-fork"></i>
+            <span>Home</span>
+          </router-link>
+          <router-link to="/products" class="top-bar-link">
+            <span>Products</span>
+          </router-link>
+          <router-link to="/past-orders" class="top-bar-link">
+            <span>Past Orders</span>
+          </router-link>
+        </nav>
+        <div @click="toogleSidebar" class="top-bar-cart-link">
+          <i class="icofont-cart-alt icofont-1x"></i>
+          <span>Cart {{ totalQuantity }}</span>
+        </div>
+      </header>
+  <router-view :inventory="inventory" :addToCart="addToCart" />
+
+  <Sidebar
+  v-if="showSidebar"
+      :toogle="toogleSidebar"
+      :cart="cart"
+      :inventory="inventory"
+      :remov="removeItem"
+  />
+</template>
+
+<script>
+import Sidebar from '@/components/Sidebar.vue'
+import food from '@/food.json'
+
+export default {
+  components: {
+    Sidebar
+  },
+  data () {
+    return {
+      showSidebar: false,
+      inventory: food,
+      cart: {}
+    }
+  },
+  computed: {
+    totalQuantity () {
+      return Object.values(this.cart).reduce((acc, curr) => {
+        return acc + curr
+      }, 0)
+    }
+  },
+  methods: {
+    addToCart (name, quantity) {
+      if (!this.cart[name]) this.cart[name] = 0
+      this.cart[name] += quantity
+    },
+    toogleSidebar () {
+      this.showSidebar = !this.showSidebar
+    },
+    removeItem (name) {
+      delete this.cart[name]
+    }
+  }
+}
+</script>
+
+
+--- Home.vue ---
+
+
+<template>
+  <div class="home">
+    <div class="splash-container">
+        <div class="splash">
+          <h1>Splendid Food</h1>
+        </div>
+      </div>
+
+      <main class="wrapper">
+
+        <h2>Recommended</h2>
+
+        <div class="recommended">
+
+          <ProductCard
+            v-for="(product, index) in inventory.slice(0,3)"
+            :key="product.id"
+            class="card"
+            :index="index"
+            :product="product"
+            :addToCart="addToCart"
+            />
+
+        </div>
+
+      </main>
+  </div>
+</template>
+
+<script>
+import ProductCard from '@/components/ProductCard.vue'
+
+export default {
+  name: 'HomeView',
+  props: ['inventory', 'addToCart'],
+  components: {
+    ProductCard
+  }
+}
+</script>
+
+
+--- PastOrder.vue ---
+
+
+<template>
+    <main class="wrapper">
+        <h1>Past Orders</h1>
+
+                <table class="product-table">
+                <thead>
+                    <tr>
+                    <td><span class="sr-only">Product Image</span></td>
+                    <td>Product</td>
+                    <td>Price</td>
+                    <td>Quantity</td>
+                    <td>Total</td>
+                    <td><span class="sr-only">Actions</span></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                    <td>
+                        <i class="icofont-carrot icofont-4x"></i>
+                    </td>
+                    <td>Carrot</td>
+                    <td>$1.00</td>
+                    <td>1</td>
+                    <td>$1.00</td>
+                    <td><button class="btn btn-dark">Add</button></td>
+                    </tr>
+                    <tr>
+                    <td>
+                        <i class="icofont-banana icofont-4x"></i>
+                    </td>
+                    <td>Banana</td>
+                    <td>$0.50</td>
+                    <td>10</td>
+                    <td>$5.00</td>
+                    <td><button class="btn btn-dark">Add</button></td>
+                    </tr>
+                </tbody>
+                </table>
+            </main>
+</template>
+
+
+--- Products ---
+
+<!-- eslint-disable vue/multi-word-component-names -->
+<template>
+  <main class="wrapper">
+        <h1>Products</h1>
+
+        <div class="card-container">
+          <ProductCard
+            v-for="(product, index) in inventory.slice(0,6)"
+            :key="product.id"
+            class="card"
+            :index="index"
+            :product="product"
+            :addToCart="addToCart"
+            />
+        </div>>
+      </main>
+</template>
+
+<script>
+import ProductCard from '@/components/ProductCard.vue'
+
+export default {
+  props: ['inventory', 'addToCart'],
+  components: {
+    ProductCard
+  }
+}
+</script>
